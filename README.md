@@ -1,4 +1,4 @@
-# botBootlegApplications
+# Телеграм бот BootlegApplications
 
 ## Описание:
 
