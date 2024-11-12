@@ -5,10 +5,11 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.fsm.storage.memory import MemoryStorage
 import os
+from dotenv import load_dotenv
 
-from decouple import config
+load_dotenv()
 
-TOKEN = "6302423087:AAEMMjincW-Gm4YeKEnXhiD7x9dSIRphBMk"
+TOKEN = os.getenv("BOT_TOKEN")
 
 
 ALL_MEDIA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "all_audio")
