@@ -1,10 +1,14 @@
 import asyncio
+import os
+
 from create_bot import bot, dp
 import logging
-from decouple import config
 from all_routers import all_routers
+from dotenv import load_dotenv
 
-admin_id = config('ADMIN')
+load_dotenv()
+
+admin_id = os.getenv('ADMIN')
 logging.basicConfig(level=logging.INFO)
 
 

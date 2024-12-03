@@ -1,5 +1,8 @@
 from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
+from database.db import Database
+
+db = Database()
 
 def menu_demo_kb():
     kb_list = [
@@ -9,10 +12,13 @@ def menu_demo_kb():
     kb = ReplyKeyboardMarkup(keyboard=kb_list, resize_keyboard=True)
     return kb
 
-def admin_kb():
+def admin_kb(user_id):
+    if not user_id or not isinstance(user_id, int):
+        raise ValueError("Неверный user_id.")
+
     kb_list = [
-        [InlineKeyboardButton(text="Принять", callback_data="accept_audio_file")],
-        [InlineKeyboardButton(text="Отказать", callback_data="reject_audio_file")]
+        [InlineKeyboardButton(text="Принять", callback_data=f"accept_audio_file_{user_id}")],
+        [InlineKeyboardButton(text="Отказать", callback_data=f"reject_audio_file_{user_id}")]
     ]
     return InlineKeyboardMarkup(inline_keyboard=kb_list)
 
