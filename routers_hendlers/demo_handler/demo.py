@@ -106,7 +106,7 @@ async def process_audio_demo(message: types.Message, state: FSMContext):
         # Отправляем аудиофайл в группу
         audio_input_file = FSInputFile(new_ren_au)
         await bot.send_audio(chat_id=chat_admin, audio=audio_input_file, caption="Новая демка:\n\n",
-                             reply_markup=admin_kb(user_id=user_id))
+                             reply_markup=admin_kb(user_id=user_id, demo_id=demo_id))
 
         await bot.delete_message(chat_id=message.chat.id, message_id=processing_message.message_id)
         await message.answer("Спасибо! Твоя демо-работа успешно отправлена администрации.",
@@ -133,7 +133,7 @@ async def accept_audio(callback_query: types.CallbackQuery):
         return
 
     user_id_str = data_parts[3]  # Изменяем индекс на 3
-
+    demo_id_str = data_parts[4]
     # Проверяем, является ли последний элемент числом
     if not user_id_str.isdigit():
         await callback_query.answer("Ошибка: неверные данные.")
@@ -142,6 +142,7 @@ async def accept_audio(callback_query: types.CallbackQuery):
 
     user_id = int(user_id_str)  # user_id отправителя демо-работы
     admin_id = callback_query.from_user.id  # admin_id инициатора (кто нажал кнопку)
+    demo_id = int(demo_id_str)
 
     await callback_query.answer("Демка принята.")
 
@@ -154,7 +155,7 @@ async def accept_audio(callback_query: types.CallbackQuery):
         # Уведомляем администратора
         await bot.send_message(
             chat_admin,  # Отправляем сообщение инициатору
-            f"Демка принята от @{username}!\nСвяжись с ним для дальнейших действий."
+            f"Демка {demo_id} принята от @{username}!\nСвяжись с ним для дальнейших действий."
         )
 
         # Уведомляем пользователя о принятии демо
@@ -167,9 +168,25 @@ async def accept_audio(callback_query: types.CallbackQuery):
 
 @demo_router.callback_query(F.data.startswith("reject_audio_file"))
 async def reject_audio(callback_query: types.CallbackQuery):
-    await callback_query.answer()
+    await callback_query.answer("Демка отклонена.")  # Уведомляем пользователя о результате
 
-    if callback_query.message.reply_to_message:
-        await callback_query.message.reply_to_message.delete()
+    data_parts = callback_query.data.split("_")
 
-    await callback_query.message.answer("Демка отклонена.")
+    # Проверяем корректность данных
+    if len(data_parts) < 4:  # Должно быть 4 части
+        await callback_query.answer("Ошибка: неверные данные.")
+        logging.error("Ошибка: недостаточно данных.")
+        return
+
+    user_id_str = data_parts[3]  # Изменяем индекс на 3
+    demo_id_str = data_parts[4]
+
+    user_id = int(user_id_str)
+    demo_id = int(demo_id_str)
+
+
+    # Уведомляем администратора о том, что демо отклонено
+    await bot.send_message(chat_admin, f"Демка {demo_id} от пользователя {user_id} отклонена.")
+
+
+    await bot.delete_message(callback_query.message.chat.id, callback_query.message.message_id)

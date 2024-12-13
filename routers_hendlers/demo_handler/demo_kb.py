@@ -12,13 +12,13 @@ def menu_demo_kb():
     kb = ReplyKeyboardMarkup(keyboard=kb_list, resize_keyboard=True)
     return kb
 
-def admin_kb(user_id):
+def admin_kb(user_id, demo_id):
     if not user_id or not isinstance(user_id, int):
         raise ValueError("Неверный user_id.")
 
     kb_list = [
-        [InlineKeyboardButton(text="Принять", callback_data=f"accept_audio_file_{user_id}")],
-        [InlineKeyboardButton(text="Отказать", callback_data=f"reject_audio_file_{user_id}")]
+        [InlineKeyboardButton(text="Принять", callback_data=f"accept_audio_file_{user_id}_{demo_id}")],
+        [InlineKeyboardButton(text="Отказать", callback_data=f"reject_audio_file_{user_id}_{demo_id}")]
     ]
     return InlineKeyboardMarkup(inline_keyboard=kb_list)
 
