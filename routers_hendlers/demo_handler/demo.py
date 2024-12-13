@@ -97,8 +97,14 @@ async def process_audio_demo(message: types.Message, state: FSMContext):
         # Сохраняем информацию о демо в базе данных
         db.add_demo(user_id, ren_au)
 
+        # Получаем demo_id
+        demo_id = db.cursor.lastrowid
+        # Переименовываем файл в Unknown{demo_id}.mp3
+        new_ren_au = os.path.join(ALL_MEDIA_DIR, f"Unknown-{demo_id}.mp3")
+        os.rename(ren_au, new_ren_au)
+
         # Отправляем аудиофайл в группу
-        audio_input_file = FSInputFile(ren_au)
+        audio_input_file = FSInputFile(new_ren_au)
         await bot.send_audio(chat_id=chat_admin, audio=audio_input_file, caption="Новая демка:\n\n",
                              reply_markup=admin_kb(user_id=user_id))
 
@@ -107,7 +113,7 @@ async def process_audio_demo(message: types.Message, state: FSMContext):
                              reply_markup=menu_kb(user_id))
 
         # Удаляем файл после отправки
-        os.remove(ren_au)
+        os.remove(new_ren_au)
         await state.clear()
     else:
         await message.answer("Отправь свою демо-работу!")
@@ -162,4 +168,8 @@ async def accept_audio(callback_query: types.CallbackQuery):
 @demo_router.callback_query(F.data.startswith("reject_audio_file"))
 async def reject_audio(callback_query: types.CallbackQuery):
     await callback_query.answer()
+
+    if callback_query.message.reply_to_message:
+        await callback_query.message.reply_to_message.delete()
+
     await callback_query.message.answer("Демка отклонена.")

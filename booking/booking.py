@@ -1,3 +1,3 @@
 user_audio_count = {}
 pending_audio_files = {}
-MAX_AUDIO_FILES = 3
+MAX_AUDIO_FILES = 2
